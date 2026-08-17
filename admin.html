@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ShopKart Admin Control Panel</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body style="background: var(--bg-main);">
+
+  <!-- Admin Login Screen (Shown when not authenticated as admin) -->
+  <div id="adminLoginScreen" style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+    <div style="background: #ffffff; width: 100%; max-width: 440px; border-radius: var(--radius-lg); padding: 36px; box-shadow: var(--shadow-xl);">
+      <div style="text-align: center; margin-bottom: 28px;">
+        <div style="width: 54px; height: 54px; background: var(--primary); color: white; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 14px;">
+          🔑
+        </div>
+        <h2 style="font-family: var(--font-heading); font-size: 24px; font-weight: 800; color: #0f172a;">ShopKart Admin Portal</h2>
+        <p style="font-size: 13px; color: #64748b; margin-top: 4px;">Enter administrative credentials to access store control panel.</p>
+      </div>
+
+      <form id="adminLoginForm" onsubmit="event.preventDefault(); window.adminApp.handleAdminLogin();">
+        <div class="form-group">
+          <label class="form-label" style="color: #0f172a;">Admin Email *</label>
+          <input type="email" id="adminEmailInput" class="form-control" placeholder="admin@shopkart.com" required style="background: #fff; color: #0f172a; border-color: #cbd5e1;" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="color: #0f172a;">Password *</label>
+          <input type="password" id="adminPassInput" class="form-control" placeholder="••••••••" required style="background: #fff; color: #0f172a; border-color: #cbd5e1;" />
+        </div>
+        <button type="submit" class="btn-submit" style="margin-top: 10px;">
+          Authorize & Log In ➔
+        </button>
+      </form>
+
+      <div style="margin-top: 20px; text-align: center; font-size: 12px; color: #64748b;">
+        <a href="index.html" style="color: var(--primary); font-weight: 600;">← Back to Customer Website</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Main Dashboard Layout (Shown after admin auth) -->
+  <div id="adminMainLayout" class="admin-layout" style="display: none;">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="admin-brand">
+        <span style="font-size: 24px;">🛍️</span>
+        <span class="brand-text">ShopKart Admin</span>
+      </div>
+
+      <ul class="admin-menu">
+        <li>
+          <a href="#" class="admin-menu-link active" id="menuLinkDashboard" onclick="window.adminApp.switchTab('dashboard')">
+            <span>📊</span> <span class="admin-menu-text">Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="admin-menu-link" id="menuLinkProducts" onclick="window.adminApp.switchTab('products')">
+            <span>📦</span> <span class="admin-menu-text">Products</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="admin-menu-link" id="menuLinkCategories" onclick="window.adminApp.switchTab('categories')">
+            <span>🏷️</span> <span class="admin-menu-text">Categories</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="admin-menu-link" id="menuLinkOrders" onclick="window.adminApp.switchTab('orders')">
+            <span>🛒</span> <span class="admin-menu-text">Orders</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="admin-menu-link" id="menuLinkCustomers" onclick="window.adminApp.switchTab('customers')">
+            <span>👥</span> <span class="admin-menu-text">Customers</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="admin-menu-link" id="menuLinkReviews" onclick="window.adminApp.switchTab('reviews')">
+            <span>⭐</span> <span class="admin-menu-text">Reviews Moderation</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="admin-menu-link" id="menuLinkActivity" onclick="window.adminApp.switchTab('activity')">
+            <span>📜</span> <span class="admin-menu-text">Login Activity</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="admin-menu-link" id="menuLinkSecurity" onclick="window.adminApp.switchTab('security')">
+            <span>🔒</span> <span class="admin-menu-text">Security / Settings</span>
+          </a>
+        </li>
+        <li style="margin-top: auto; padding-top: 20px;">
+          <a href="index.html" class="admin-menu-link">
+            <span>🌐</span> <span class="admin-menu-text">Customer Website</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="admin-menu-link" style="color: #ef4444;" onclick="window.auth.logout()">
+            <span>🚪</span> <span class="admin-menu-text">Logout</span>
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+      <!-- Top Bar -->
+      <div class="admin-topbar">
+        <div>
+          <h2 style="font-family: var(--font-heading); font-size: 22px; font-weight: 700;" id="adminPageTitle">Dashboard Overview</h2>
+          <span style="font-size: 13px; color: var(--text-muted);" id="adminPageSubtitle">Store performance and statistics summary</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <button class="theme-toggle-btn" onclick="window.adminApp.toggleTheme()" style="background: var(--bg-subtle); color: var(--text-main); border: 1px solid var(--border-color);" title="Toggle Theme">
+            🌓
+          </button>
+          <button class="btn-hero" style="font-size: 13px; padding: 8px 16px;" onclick="window.adminApp.openAddProductModal()">
+            ➕ Add New Product
+          </button>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 38px; height: 38px; border-radius: 50%; background: var(--primary); color: white; font-weight: 800; display: flex; align-items: center; justify-content: center;">
+              A
+            </div>
+            <span style="font-weight: 600; font-size: 14px;" id="adminUserName">Admin</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- DASHBOARD VIEW -->
+      <div id="viewDashboard">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon blue">📦</div>
+            <div>
+              <div class="kpi-val" id="kpiTotalProducts">0</div>
+              <div class="kpi-lbl">Total Products</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon green">🛒</div>
+            <div>
+              <div class="kpi-val" id="kpiTotalOrders">0</div>
+              <div class="kpi-lbl">Total Orders</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon orange">⏳</div>
+            <div>
+              <div class="kpi-val" id="kpiPendingOrders">0</div>
+              <div class="kpi-lbl">Pending Orders</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon red">⚠️</div>
+            <div>
+              <div class="kpi-val" id="kpiLowStock">0</div>
+              <div class="kpi-lbl">Low Stock Alerts</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon purple">💰</div>
+            <div>
+              <div class="kpi-val" id="kpiTotalRevenue">₹0</div>
+              <div class="kpi-lbl">Total Sales / Revenue</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-top: 30px;">
+          <div class="data-table-container">
+            <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); font-weight: 700; font-size: 16px;">
+              Recent Customer Orders
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th>Total</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="dashboardRecentOrdersTbody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+
+          <div style="background: var(--bg-card); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 16px;">Category Distribution</h3>
+            <div id="categoryChartContainer" style="display: flex; flex-direction: column; gap: 12px;">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRODUCTS MANAGEMENT VIEW -->
+      <div id="viewProducts" style="display: none;">
+        <div class="data-table-container">
+          <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="font-size: 16px; font-weight: 700;">All Catalogue Products</h3>
+            <input type="text" id="adminProductSearch" placeholder="Filter products..." class="form-control" style="width: 250px;" oninput="window.adminApp.renderProductsTable()" />
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Discount</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminProductsTbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CATEGORIES MANAGEMENT VIEW -->
+      <div id="viewCategories" style="display: none;">
+        <div class="data-table-container">
+          <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="font-size: 16px; font-weight: 700;">Product Categories</h3>
+            <button class="btn-hero" style="font-size: 13px; padding: 6px 14px;" onclick="window.adminApp.openAddCategoryModal()">
+              ➕ Add Category
+            </button>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Icon</th>
+                <th>Category Name</th>
+                <th>Category ID</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="adminCategoriesTbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ORDERS MANAGEMENT VIEW -->
+      <div id="viewOrders" style="display: none;">
+        <div class="data-table-container">
+          <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); font-weight: 700; font-size: 16px;">
+            Order Processing & Lifecycle Management
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer & Address</th>
+                <th>Items Ordered</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions & Status Update</th>
+              </tr>
+            </thead>
+            <tbody id="adminOrdersTbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CUSTOMERS MANAGEMENT VIEW -->
+      <div id="viewCustomers" style="display: none;">
+        <div class="data-table-container">
+          <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); font-weight: 700; font-size: 16px;">
+            Registered Customer Roster
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Customer Name</th>
+                <th>Email Address</th>
+                <th>Phone</th>
+                <th>Role</th>
+                <th>Registration Date</th>
+                <th>Total Orders</th>
+              </tr>
+            </thead>
+            <tbody id="adminCustomersTbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- REVIEWS MODERATION VIEW -->
+      <div id="viewReviews" style="display: none;">
+        <div class="data-table-container">
+          <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); font-weight: 700; font-size: 16px;">
+            Customer Reviews Moderation
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Customer</th>
+                <th>Rating</th>
+                <th>Review Comment</th>
+                <th>Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="adminReviewsTbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- LOGIN ACTIVITY VIEW -->
+      <div id="viewActivity" style="display: none;">
+        <div class="data-table-container">
+          <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); font-weight: 700; font-size: 16px;">
+            Login Activity & Security Audit Trail
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date & Time</th>
+                <th>Event Type</th>
+                <th>User / Email</th>
+                <th>Device / Browser</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="adminActivityTbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SECURITY / SETTINGS VIEW -->
+      <div id="viewSecurity" style="display: none;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+          <!-- Change Password Card -->
+          <div style="background: var(--bg-card); padding: 24px; border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+              <span style="font-size: 24px;">🔑</span>
+              <h3 style="font-size: 18px; font-weight: 700;">Change Admin Password</h3>
+            </div>
+            
+            <form id="changePasswordForm" onsubmit="event.preventDefault(); window.adminApp.handleChangePassword();">
+              <div class="form-group">
+                <label class="form-label">Current Password *</label>
+                <input type="password" id="changeCurrPass" class="form-control" required placeholder="Enter current password" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">New Password *</label>
+                <input type="password" id="changeNewPass" class="form-control" required placeholder="At least 6 characters" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Confirm New Password *</label>
+                <input type="password" id="changeConfirmPass" class="form-control" required placeholder="Re-enter new password" />
+              </div>
+              <button type="submit" class="btn-submit" style="margin-top: 10px;">
+                Update Password & Re-authenticate 🔒
+              </button>
+            </form>
+          </div>
+
+          <!-- Active Sessions Card & Threshold Settings -->
+          <div style="display: flex; flex-direction: column; gap: 24px;">
+            <div style="background: var(--bg-card); padding: 24px; border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+                <span style="font-size: 24px;">⚠️</span>
+                <h3 style="font-size: 18px; font-weight: 700;">Low Stock Alert Threshold</h3>
+              </div>
+              <div class="form-group" style="margin: 0;">
+                <label class="form-label">Trigger alert when stock is less than or equal to:</label>
+                <div style="display: flex; gap: 10px;">
+                  <input type="number" id="lowStockThresholdInput" class="form-control" value="5" min="1" max="50" style="max-width: 120px;" />
+                  <button class="btn-hero" style="font-size: 13px; padding: 6px 16px;" onclick="window.adminApp.handleSaveThreshold()">Save Setting</button>
+                </div>
+              </div>
+            </div>
+
+            <div style="background: var(--bg-card); padding: 24px; border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                <span style="font-size: 24px;">💻</span>
+                <h3 style="font-size: 18px; font-weight: 700;">Active Sessions</h3>
+              </div>
+              <div id="activeSessionsList" style="display: flex; flex-direction: column; gap: 14px;">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Add / Edit Product Modal -->
+  <div class="modal-overlay" id="productModal">
+    <div class="modal-card large">
+      <div class="modal-header">
+        <h3 class="modal-title" id="productModalTitle">Add New Product</h3>
+        <button class="btn-close-modal" onclick="window.adminApp.closeModal('productModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="productForm" onsubmit="event.preventDefault(); window.adminApp.handleSaveProduct();">
+          <input type="hidden" id="prodFormId" />
+
+          <div class="form-group">
+            <label class="form-label">Product Title / Name *</label>
+            <input type="text" id="prodFormName" class="form-control" required placeholder="e.g. ShopKart ANC Wireless Headphones" />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Selling Price (₹) *</label>
+              <input type="number" id="prodFormPrice" class="form-control" required placeholder="1499" min="1" oninput="window.adminApp.calcDiscount()" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Original Price (M.R.P. ₹)</label>
+              <input type="number" id="prodFormOriginalPrice" class="form-control" placeholder="2999" min="1" oninput="window.adminApp.calcDiscount()" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Discount Percentage (%)</label>
+              <input type="number" id="prodFormDiscount" class="form-control" placeholder="50" readonly />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Category *</label>
+              <select id="prodFormCategory" class="form-control" required>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Stock Quantity *</label>
+              <input type="number" id="prodFormStock" class="form-control" required placeholder="10" min="0" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Product Status *</label>
+              <select id="prodFormStatus" class="form-control" required>
+                <option value="Active">Active / Published</option>
+                <option value="Out of Stock">Out of Stock</option>
+                <option value="Draft">Draft</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Product Image Path / URL or Local Asset *</label>
+            <input type="text" id="prodFormImage" class="form-control" required placeholder="e.g. static2/image/Earbuds.jpg or https://..." />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Detailed Description</label>
+            <textarea id="prodFormDescription" class="form-control" rows="3" placeholder="Enter key features, specifications, and warranty details..."></textarea>
+          </div>
+
+          <button type="submit" class="btn-submit" style="margin-top: 10px;">
+            Save Product & Publish to Store ➔
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Category Modal -->
+  <div class="modal-overlay" id="categoryModal">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Add New Category</h3>
+        <button class="btn-close-modal" onclick="window.adminApp.closeModal('categoryModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="categoryForm" onsubmit="event.preventDefault(); window.adminApp.handleSaveCategory();">
+          <div class="form-group">
+            <label class="form-label">Category Name *</label>
+            <input type="text" id="catFormName" class="form-control" required placeholder="e.g. Footwear, Watches, Laptops" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Emoji / Icon Symbol</label>
+            <input type="text" id="catFormIcon" class="form-control" placeholder="👟" />
+          </div>
+          <button type="submit" class="btn-submit" style="margin-top: 10px;">
+            Save Category ➔
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" id="deleteConfirmModal">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Confirm Deletion</h3>
+        <button class="btn-close-modal" onclick="window.adminApp.closeModal('deleteConfirmModal')">✕</button>
+      </div>
+      <div class="modal-body" style="text-align: center;">
+        <div style="font-size: 48px; margin-bottom: 10px;">⚠️</div>
+        <h4 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Delete Item?</h4>
+        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">
+          Are you sure you want to permanently remove this item?
+        </p>
+        <div style="display: flex; gap: 12px;">
+          <button class="btn-submit" style="background: #cbd5e1; color: var(--text-main); flex: 1;" onclick="window.adminApp.closeModal('deleteConfirmModal')">
+            Cancel
+          </button>
+          <button class="btn-submit" style="background: var(--danger); flex: 1;" id="confirmDeleteBtn">
+            Yes, Delete Item
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Printable Invoice Modal Overlay -->
+  <div class="modal-overlay" id="adminInvoiceModal">
+    <div class="modal-card large">
+      <div class="modal-header no-print">
+        <h3 class="modal-title">Order Tax Invoice</h3>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn-hero" style="font-size: 13px; padding: 6px 14px;" onclick="window.print()">🖨️ Print Invoice</button>
+          <button class="btn-close-modal" onclick="window.adminApp.closeModal('adminInvoiceModal')">✕</button>
+        </div>
+      </div>
+      <div class="modal-body" id="adminInvoiceModalBody" style="padding: 0;">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Scripts -->
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
