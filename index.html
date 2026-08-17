@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ShopKart - Online Shopping for Mobiles, Electronics, Fashion & More</title>
+  <meta name="description" content="ShopKart is India's leading online store for electronics, mobiles, fashion, and home appliances with fast shipping and amazing discount prices." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="container">
+      <span>🔥 Sale is Live! Free Shipping on Orders Over ₹499</span>
+      <div style="display: flex; gap: 15px; align-items: center;">
+        <a href="admin.html" style="color: var(--accent); font-weight: bold;">🔑 Admin Portal</a>
+        <span>📞 Support: 1800-123-SHOP</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Site Header / Navbar -->
+  <header class="site-header">
+    <div class="container">
+      <div class="main-nav">
+        <div class="nav-wrapper">
+          
+          <!-- Logo -->
+          <a href="index.html" class="brand-logo" aria-label="ShopKart Homepage">
+            <span class="logo-icon">🛍️</span>
+            <div>
+              <span>ShopKart</span>
+              <span class="plus-tag">Explore Plus ✦</span>
+            </div>
+          </a>
+
+          <!-- Search Bar -->
+          <form class="search-form" id="searchForm" onsubmit="event.preventDefault(); window.app.handleSearch();" role="search">
+            <div class="search-input-group">
+              <input type="text" id="searchInput" placeholder="Search for products, brands and categories..." aria-label="Search products" />
+              <button type="submit" aria-label="Submit Search">🔍 Search</button>
+            </div>
+          </form>
+
+          <!-- Nav Actions -->
+          <div class="nav-actions">
+            <!-- Theme Toggle -->
+            <button class="theme-toggle-btn" onclick="window.app.toggleTheme()" aria-label="Toggle Dark or Light Mode" title="Toggle Theme">
+              🌙
+            </button>
+
+            <!-- Auth / User Account -->
+            <div id="userNavContainer">
+              <button class="nav-btn nav-btn-highlight" onclick="window.app.openAuthModal('login')">
+                👤 <span>Login</span>
+              </button>
+            </div>
+
+            <!-- Wishlist -->
+            <button class="nav-btn" onclick="window.app.openWishlistModal()" aria-label="Wishlist items">
+              ❤️ <span>Wishlist</span>
+              <span class="badge-count" id="wishlistCountBadge">0</span>
+            </button>
+
+            <!-- Cart -->
+            <button class="nav-btn nav-btn-highlight" onclick="window.app.toggleCartDrawer()" aria-label="Shopping Cart">
+              🛒 <span>Cart</span>
+              <span class="badge-count danger" id="cartCountBadge">0</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Bar -->
+    <div class="category-bar">
+      <div class="container">
+        <div class="category-bar-wrapper" id="categoryBarContainer" role="navigation" aria-label="Product categories">
+          <!-- Dynamically populated categories -->
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Hero Banner -->
+    <section class="hero-section">
+      <div class="hero-banner">
+        <div class="hero-content">
+          <span class="hero-badge">Big Electronics & Fashion Week</span>
+          <h1 class="hero-title">Upgrade Your Style & Tech Today</h1>
+          <p class="hero-subtitle">Get up to 60% off on top branded gadgets, smartphones, wearables, and trendy apparel.</p>
+          <button class="btn-hero" onclick="document.getElementById('productSection').scrollIntoView();">
+            Explore Deals Now ➔
+          </button>
+        </div>
+        <div class="hero-image-side">
+          🎁
+        </div>
+      </div>
+    </section>
+
+    <!-- Filter & Sort Controls -->
+    <section class="controls-bar">
+      <div class="filter-pills" id="categoryFilterPills">
+        <!-- Rendered by JS -->
+      </div>
+      
+      <div class="sort-select-wrapper">
+        <label for="sortSelect">Sort By:</label>
+        <select id="sortSelect" class="custom-select" onchange="window.app.handleSortChange(this.value)">
+          <option value="featured">Featured</option>
+          <option value="price_low">Price: Low to High</option>
+          <option value="price_high">Price: High to Low</option>
+          <option value="discount">Highest Discount</option>
+          <option value="rating">Customer Rating</option>
+          <option value="newest">Newest Arrivals</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Product Grid Section -->
+    <section id="productSection" style="padding-bottom: 40px;">
+      <div class="section-header">
+        <h2 class="section-title" id="sectionTitle">All Products</h2>
+        <span id="productCountLabel" style="font-size: 14px; color: var(--text-muted);">Showing 0 items</span>
+      </div>
+
+      <div class="product-grid" id="productGrid">
+        <!-- Dynamic Product Cards loaded from DB -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Product Details Modal -->
+  <div class="modal-overlay" id="productDetailModal" role="dialog" aria-modal="true">
+    <div class="modal-card large">
+      <div class="modal-header">
+        <h3 class="modal-title">Product Details</h3>
+        <button class="btn-close-modal" onclick="window.app.closeModal('productDetailModal')" aria-label="Close modal">✕</button>
+      </div>
+      <div class="modal-body" id="productDetailBody">
+        <!-- Dynamic Content -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Cart Slide-Over Drawer -->
+  <div class="cart-drawer" id="cartDrawer" role="dialog" aria-label="Shopping Cart">
+    <div class="cart-header">
+      <h3 style="font-family: var(--font-heading); font-size: 18px; font-weight: 700;">Shopping Cart 🛒</h3>
+      <button class="btn-close-modal" onclick="window.app.toggleCartDrawer()" aria-label="Close cart">✕</button>
+    </div>
+    <div class="cart-body" id="cartBody">
+      <!-- Dynamic Cart Items & Save for Later -->
+    </div>
+    <div class="cart-footer" id="cartFooter">
+      <!-- Subtotal & Checkout Button -->
+    </div>
+  </div>
+
+  <!-- Checkout Modal -->
+  <div class="modal-overlay" id="checkoutModal" role="dialog" aria-modal="true">
+    <div class="modal-card large">
+      <div class="modal-header">
+        <h3 class="modal-title">Checkout & Shipping Address</h3>
+        <button class="btn-close-modal" onclick="window.app.closeModal('checkoutModal')" aria-label="Close checkout">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="checkoutForm" onsubmit="event.preventDefault(); window.app.handlePlaceOrder();">
+          <div class="product-detail-view">
+            <!-- Left: Delivery Information -->
+            <div>
+              <h4 style="margin-bottom: 16px; font-size: 16px; color: var(--text-main);">Shipping Details</h4>
+              <div class="form-group">
+                <label class="form-label">Full Name *</label>
+                <input type="text" id="chkName" class="form-control" required placeholder="Enter full name" />
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Email Address *</label>
+                  <input type="email" id="chkEmail" class="form-control" required placeholder="name@example.com" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Phone Number *</label>
+                  <input type="tel" id="chkPhone" class="form-control" required placeholder="10-digit mobile number" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Delivery Address *</label>
+                <textarea id="chkAddress" class="form-control" rows="3" required placeholder="House/Flat No., Street, Area, Landmark"></textarea>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">City *</label>
+                  <input type="text" id="chkCity" class="form-control" required placeholder="City" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Pincode *</label>
+                  <input type="text" id="chkPincode" class="form-control" required placeholder="6-digit pincode" />
+                </div>
+              </div>
+
+              <h4 style="margin: 20px 0 12px; font-size: 16px; color: var(--text-main);">Payment Option</h4>
+              <div style="background: var(--bg-subtle); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 600;">
+                  <input type="radio" name="paymentMethod" value="Demo Payment / COD" checked />
+                  <span>💵 Cash on Delivery / Demo Test Checkout</span>
+                </label>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px; margin-left: 24px;">
+                  Ready for payment gateway integration (Razorpay/Stripe). Orders placed create real order history and printable invoice.
+                </p>
+              </div>
+            </div>
+
+            <!-- Right: Order Summary Breakdown -->
+            <div style="background: var(--bg-subtle); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color); display: flex; flex-direction: column;">
+              <h4 style="margin-bottom: 16px; font-size: 16px; color: var(--text-main);">Order Summary</h4>
+              <div id="checkoutItemsList" style="flex: 1; max-height: 250px; overflow-y: auto; margin-bottom: 16px;">
+                <!-- Dynamically filled -->
+              </div>
+
+              <div style="border-top: 1px solid var(--border-color); padding-top: 14px;">
+                <div class="cart-summary-row">
+                  <span>Items Subtotal:</span>
+                  <span id="chkSubtotal">₹0</span>
+                </div>
+                <div class="cart-summary-row">
+                  <span>Delivery Charge:</span>
+                  <span id="chkDelivery" style="color: var(--success); font-weight: 600;">FREE</span>
+                </div>
+                <div class="cart-summary-row total">
+                  <span>Grand Total:</span>
+                  <span id="chkTotal">₹0</span>
+                </div>
+
+                <button type="submit" class="btn-checkout" style="margin-top: 16px;">
+                  Place Order Now ➔
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Login / Signup Modal -->
+  <div class="modal-overlay" id="authModal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="authModalTitle">Account Access</h3>
+        <button class="btn-close-modal" onclick="window.app.closeModal('authModal')" aria-label="Close login">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color);">
+          <button id="tabBtnLogin" class="cat-item active" style="flex: 1; padding: 10px;" onclick="window.app.switchAuthTab('login')">Login</button>
+          <button id="tabBtnSignup" class="cat-item" style="flex: 1; padding: 10px;" onclick="window.app.switchAuthTab('signup')">Create Account</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" onsubmit="event.preventDefault(); window.app.handleLogin();">
+          <div class="form-group">
+            <label class="form-label">Email Address *</label>
+            <input type="email" id="loginEmail" class="form-control" required placeholder="name@example.com" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password *</label>
+            <input type="password" id="loginPassword" class="form-control" required placeholder="Enter password" />
+          </div>
+          <button type="submit" class="btn-submit">Log In to ShopKart</button>
+        </form>
+
+        <!-- Signup Form -->
+        <form id="signupForm" style="display: none;" onsubmit="event.preventDefault(); window.app.handleSignup();">
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input type="text" id="signupName" class="form-control" required placeholder="Enter full name" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address *</label>
+            <input type="email" id="signupEmail" class="form-control" required placeholder="name@example.com" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Password *</label>
+              <input type="password" id="signupPassword" class="form-control" required placeholder="At least 6 characters" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Confirm Password *</label>
+              <input type="password" id="signupConfirmPassword" class="form-control" required placeholder="Re-enter password" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number (Optional)</label>
+            <input type="tel" id="signupPhone" class="form-control" placeholder="10-digit mobile number" />
+          </div>
+          <button type="submit" class="btn-submit">Register Account</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Orders / User Profile Modal -->
+  <div class="modal-overlay" id="myOrdersModal" role="dialog" aria-modal="true">
+    <div class="modal-card large">
+      <div class="modal-header">
+        <h3 class="modal-title">My Orders & Purchase History</h3>
+        <button class="btn-close-modal" onclick="window.app.closeModal('myOrdersModal')" aria-label="Close my orders">✕</button>
+      </div>
+      <div class="modal-body" id="myOrdersBody">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Printable Order Invoice Modal -->
+  <div class="modal-overlay" id="invoiceModal" role="dialog" aria-modal="true">
+    <div class="modal-card large">
+      <div class="modal-header no-print">
+        <h3 class="modal-title">Tax Invoice & Order Receipt</h3>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn-hero" style="font-size: 13px; padding: 6px 14px;" onclick="window.print()">🖨️ Print Invoice</button>
+          <button class="btn-close-modal" onclick="window.app.closeModal('invoiceModal')">✕</button>
+        </div>
+      </div>
+      <div class="modal-body" id="invoiceModalBody" style="padding: 0;">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>About ShopKart</h4>
+          <ul>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">ShopKart Stories</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Help & Support</h4>
+          <ul>
+            <li><a href="#">Payments</a></li>
+            <li><a href="#">Shipping & Delivery</a></li>
+            <li><a href="#">Cancellation & Returns</a></li>
+            <li><a href="#">FAQ</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Policy</h4>
+          <ul>
+            <li><a href="#">Return Policy</a></li>
+            <li><a href="#">Terms Of Use</a></li>
+            <li><a href="#">Security</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Admin Portal</h4>
+          <p style="font-size: 13px; line-height: 1.5; margin-bottom: 12px;">Store owners and administrators can log into the secure management dashboard.</p>
+          <a href="admin.html" class="nav-btn nav-btn-highlight" style="display: inline-block; text-align: center;">Go to Admin Panel 🔒</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© 2026 ShopKart Inc. All Rights Reserved. Built with HTML, CSS, JavaScript & Dynamic Database Architecture.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
